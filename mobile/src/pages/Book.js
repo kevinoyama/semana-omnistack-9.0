@@ -1,18 +1,30 @@
 import React, { useState } from 'react';
-import { SafeAreaView, AsyncStorage, TouchableOpacity, StyleSheet, Text, TextInput } from 'react-native';
+import { SafeAreaView, AsyncStorage, Alert, TouchableOpacity, StyleSheet, Text, TextInput } from 'react-native';
+
+import api from '../services/api';
 
 export default function Book({ navigation }) {
 
-    const id = navigation.getParam('id');
+    const spot_id = navigation.getParam('id');
 
     const [date, setDate] = useState('');
 
-    function handleSubmit(){
+    async function handleSubmit(){
+        const user_id = await AsyncStorage.getItem('user');
 
+        await api.post(`/spots/${spot_id}/bookings`,{
+            date,
+        }, {
+            headers: {user_id}
+        });
+
+        Alert.alert('Solicitação de reserva enviada.')
+
+        navigation.navigate('List');
     }
 
     function handleCancel(){
-
+        navigation.navigate('List');
     }
 
     return (
@@ -30,8 +42,8 @@ export default function Book({ navigation }) {
             <TouchableOpacity onPress={handleSubmit} style={styles.button}>
                 <Text style={styles.buttonText}>Solicitar Reserva</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
-                <Text style={styles.buttonTextCancel}>Cancelar</Text>
+            <TouchableOpacity onPress={handleCancel} style={[styles.button, styles.cancelButton]}>
+                <Text style={styles.buttonText}>Cancelar</Text>
             </TouchableOpacity>
         </SafeAreaView>
     )
@@ -39,7 +51,7 @@ export default function Book({ navigation }) {
 
 const styles = StyleSheet.create({
     container:{
-        marginTop: 30,
+        margin: 30,
     },
 
     label: {
@@ -64,6 +76,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 2,
+    },
+
+    cancelButton: {
+        backgroundColor: '#ccc',
+        marginTop: 10,
     },
 
     buttonText: {

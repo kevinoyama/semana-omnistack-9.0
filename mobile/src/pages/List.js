@@ -4,6 +4,7 @@ import { SafeAreaView, AsyncStorage, Image, StyleSheet } from 'react-native';
 import SpotList from '../components/SpotList';
 
 import logo from '../assets/logo.png';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function List(){
 
@@ -20,7 +21,9 @@ export default function List(){
     return (
     <SafeAreaView style={styles.container}>
         <Image style={styles.logo} source={logo}/>
-        <SpotList tech="ReactJS"/>
+        <ScrollView>
+        {techs.map(tech => <SpotList key={tech} tech={tech}/>)}
+        </ScrollView>
     </SafeAreaView>
     )
 }

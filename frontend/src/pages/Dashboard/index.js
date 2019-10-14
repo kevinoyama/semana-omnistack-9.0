@@ -1,11 +1,27 @@
 import React, {useEffect, useState} from 'react';
 import { Link } from 'react-router-dom';
+import socketio from 'socket.io-client';
 import api from '../../services/api';
 
+
 import './style.css';
+import { styles } from 'ansi-colors';
 
 export default function Dashboard(){
     const[spots, setSpots] = useState([]);
+    const [requests, setRequests] = useState([]);
+
+
+
+    useEffect(()=>{
+        const user_id = localStorage.getItem('user');
+        const socket = socketio('http://localhost:3333', {
+            query: {user_id},
+        });
+        socket.on('booking_request', data => {
+            setRequests([...requests, data]);
+        })
+    },[])
 
     useEffect(()=> {
         async function loadSpots(){
@@ -22,8 +38,34 @@ export default function Dashboard(){
         loadSpots();
     }, []);
 
+    async function handleAccept(id){
+        await api.post(`/bookings/${id}/approvals`);
+
+        setRequests(requests.filter(req => req._id !== id));
+    }
+
+    async function handleRejection(id){
+        await api.post(`/bookings/${id}/rejections`);
+
+        setRequests(requests.filter(req => req._id !== id));
+    }
+
+
     return (
         <>
+
+            <ul className="notification">
+                {requests.map(req=>(
+                    <li key={req._id}>
+                        <p>
+                            <strong>{req.user.email}</strong> está solicitando uma reserva em <strong>{req.spot.company}</strong> para a data: <strong>{req.date}</strong>
+                        </p>
+                        <button onClick={()=>handleAccept(req._id)} className="acceptButton">ACEITAR</button>
+                        <button onClick={()=>handleRejection(req._id)} className="rejectionButton">REJEITAR</button>
+                    </li>
+                ))}
+            </ul>
+
             <ul className="spot-list">
                 {spots.map(spot=>(
                     <li key ={spot._id}>

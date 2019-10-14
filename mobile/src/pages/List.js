@@ -6,7 +6,7 @@ import SpotList from '../components/SpotList';
 import logo from '../assets/logo.png';
 import { ScrollView } from 'react-native-gesture-handler';
 
-export default function List({navigation}) {
+export default function List({ navigation }) {
 
     const [_id, setId] = useState('');
     const [techs, setTechs] = useState([]);
@@ -18,7 +18,7 @@ export default function List({navigation}) {
         })
     }, [])
 
-    async function handleExit(){
+    async function handleExit() {
         await AsyncStorage.removeItem('user');
         navigation.navigate('Login');
     }
@@ -27,12 +27,13 @@ export default function List({navigation}) {
         <SafeAreaView style={styles.container}>
             <View style={styles.headers}>
                 <Image style={styles.logo} source={logo} />
-                <TouchableOpacity onPress={handleExit} style={styles.button}>
-                    <Text style={styles.buttonText}>Log Out</Text>
-                </TouchableOpacity>
             </View>
             <ScrollView>
                 {techs.map(tech => <SpotList key={tech} tech={tech} />)}
+
+                <TouchableOpacity onPress={handleExit} style={styles.button}>
+                    <Text style={styles.buttonText}>Log Out</Text>
+                </TouchableOpacity>
             </ScrollView>
         </SafeAreaView>
     )
@@ -59,6 +60,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 2,
+        marginTop: 5,
+        marginBottom: 7
     },
 
     buttonText: {

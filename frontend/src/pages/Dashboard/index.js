@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import { Link } from 'react-router-dom';
 import socketio from 'socket.io-client';
 import api from '../../services/api';
@@ -11,17 +11,16 @@ export default function Dashboard(){
     const[spots, setSpots] = useState([]);
     const [requests, setRequests] = useState([]);
 
-
+    const user_id = localStorage.getItem('user');
+    const socket = useMemo(()=> socketio('http://localhost:3333', {
+        query: {user_id},
+    }), [user_id]);
 
     useEffect(()=>{
-        const user_id = localStorage.getItem('user');
-        const socket = socketio('http://localhost:3333', {
-            query: {user_id},
-        });
         socket.on('booking_request', data => {
             setRequests([...requests, data]);
         })
-    },[])
+    },[requests, socket])
 
     useEffect(()=> {
         async function loadSpots(){
